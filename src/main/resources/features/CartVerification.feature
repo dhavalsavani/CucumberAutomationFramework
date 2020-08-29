@@ -17,16 +17,15 @@
 ## (Comments)
 #Sample Feature Definition Template
 @tag
-Feature: Practice Cucumber BDD
-  I want to explore different features of Cucumber
+Feature: Add to Cart verification
+  I want to verify items added to the cart
 
-  @tag1
-  Scenario Outline: Open practice website
+ @tag2
+  Scenario: Verify Add to cart feature
     Given I want explore Cucumber features
-    When I open the automation practice <website>
-    Then I validate practice website title is <title>
-    
-    Examples:
-    |									website						 		|									title	 							|
-		| "http://www.automationpractice.com/"	| 							My Store 							|
-		| "https://www.phptravels.com/demo/"		|	Demo Script Test drive - PHPTRAVELS |
+    When I open the automation practice "http://www.automationpractice.com/"
+    And I Go to Dresses menu
+    And I add my favourite dresses to cart
+    	|Printed Dress				|
+    	|Printed Chiffon Dress|
+    Then I should see dresses added into the cart

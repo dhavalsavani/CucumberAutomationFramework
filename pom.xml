@@ -5,6 +5,23 @@
 	<groupId>com.automation</groupId>
 	<artifactId>CucumberAutomationFramework</artifactId>
 	<version>1.0.0</version>
+	
+	<properties>
+		<selenium.version>3.141.59</selenium.version>
+		<cucumber.version>4.3.1</cucumber.version>
+		<junit.version>4.13</junit.version>
+		<log4j2.version>2.13.3</log4j2.version>
+		<webdriver.manager.version>4.2.0</webdriver.manager.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<cucable.plugin.version>1.8.0</cucable.plugin.version>
+		<cluecumber.report.plugin.version>2.5.0</cluecumber.report.plugin.version>
+		<maven.failsafe.plugin.version>2.22.1</maven.failsafe.plugin.version>
+		<maven.build.helper.plugin.version>3.0.0</maven.build.helper.plugin.version>
+		<maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+		<generated.runner.directory>${project.build.directory}/parallel/runners</generated.runner.directory>
+		<generated.feature.directory>${project.build.directory}/parallel/features</generated.feature.directory>
+	</properties>
 
 	<dependencies>
 
@@ -13,25 +30,59 @@
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-junit</artifactId>
-			<version>4.3.1</version>
+			<version>${cucumber.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-java</artifactId>
-			<version>4.3.1</version>
+			<version>${cucumber.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-core</artifactId>
-			<version>4.3.1</version>
+			<version>${cucumber.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-picocontainer</artifactId>
-			<version>4.3.1</version>
+			<version>${cucumber.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+		</dependency>
+		
+		<!-- Selenium Webdriver dependencies -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-server</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		
+		<!-- Webdriver Manager dependencies -->
+		<dependency>
+			<groupId>io.github.bonigarcia</groupId>
+			<artifactId>webdrivermanager</artifactId>
+			<version>${webdriver.manager.version}</version>
+		</dependency>
+		
+		<!-- Libraries for Logger -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j2.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -39,12 +90,137 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>com.trivago.rta</groupId>
+				<artifactId>cucable-plugin</artifactId>
+				<version>${cucable.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>generate-test-resources</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>parallel</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- This can be either a Java class file or a text based template -->
+					<sourceRunnerTemplateFile>src/test/java/runner/ParalleTestRunner.java</sourceRunnerTemplateFile>
+					<!-- <sourceRunnerTemplateFile>src/test/resources/cucable.template</sourceRunnerTemplateFile> -->
+
+					<!-- process all features in the given directory -->
+					<sourceFeatures>src/main/resources/features</sourceFeatures>
+					<!-- process a specific feature file in the given directory -->
+					<!-- <sourceFeatures>src/test/resources/features/testfeature/MyTest3.feature</sourceFeatures> -->
+
+					<!-- process a specific feature file and specific line numbers in the 
+						given directory -->
+					<!-- <sourceFeatures>src/test/resources/features/testfeature/MyTest1.feature:8:19</sourceFeatures> -->
+
+					<generatedFeatureDirectory>${generated.feature.directory}</generatedFeatureDirectory>
+					<generatedRunnerDirectory>${generated.runner.directory}</generatedRunnerDirectory>
+
+					<!-- optional: custom data that is available in Cucable placeholders -->
+					<!-- in a template -->
+					<!-- <customPlaceholders> -->
+					<!-- <comment>This should appear inside the template</comment> -->
+					<!-- </customPlaceholders> -->
+
+					<!-- optional: include scenarios with certain tags -->
+					<!-- <includeScenarioTags> -->
+					<!-- <param>@scenarioTag1</param> -->
+					<!-- <param>@scenarioTag2</param> -->
+					<!-- </includeScenarioTags> -->
+
+					<!-- optional: exclude scenarios with certain tags -->
+					<excludeScenarioTags>
+						<param>@tag</param>
+					</excludeScenarioTags>
+
+					<!-- optional: change parallelization mode of Cucable (default: "scenarios") -->
+					<!-- <parallelizationMode>scenarios</parallelizationMode> -->
+					<parallelizationMode>features</parallelizationMode>
+
+					<!-- optional: number of test runs to create runners and features multiple -->
+					<!-- times if set to a number greater than 1 -->
+					<!-- <numberOfTestRuns>1</numberOfTestRuns> -->
+
+					<!-- optional: generate fixed number of runners and distribute all features -->
+					<!-- round-robin. -->
+					<!-- <desiredNumberOfRunners>2</desiredNumberOfRunners> -->
+
+					<!-- optional: Cucable log level -->
+					<!-- <logLevel>default</logLevel> -->
+					<!-- <logLevel>compact</logLevel> -->
+					<!-- <logLevel>minimal</logLevel> -->
+					<!-- <logLevel>off</logLevel> -->
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>${maven.build.helper.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${generated.runner.directory}</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>${maven.failsafe.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>Run parallel tests</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- <forkCount>2</forkCount> -->
+					<!-- <reuseForks>false</reuseForks> -->
+					<!-- <parallel>classes</parallel> -->
+					<!-- <threadCount>2</threadCount> -->
+					<testFailureIgnore>trueC</testFailureIgnore>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>${maven.compiler.plugin.version}</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>8</source>
+					<target>8</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.trivago.rta</groupId>
+				<artifactId>cluecumber-report-plugin</artifactId>
+				<version>${cluecumber.report.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>report</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>reporting</goal><!-- for Command Line use 'mvn cluecumber-report:reporting' command -->
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<sourceJsonReportDirectory>target/cucumber-report</sourceJsonReportDirectory>
+					<generatedHtmlReportDirectory>target/test-report-html</generatedHtmlReportDirectory>
 				</configuration>
 			</plugin>
 		</plugins>
